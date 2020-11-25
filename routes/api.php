@@ -19,6 +19,7 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 
 Route::any('{prefix?}/{info?}', function(Request $request) {
 	$curl = curl_init();
+	$token = $request->header('Authorization');
 	curl_setopt_array($curl, array(
 		CURLOPT_URL => env('USER_URL') . '/' . $request->path(),
 		CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
@@ -28,7 +29,9 @@ Route::any('{prefix?}/{info?}', function(Request $request) {
 		CURLOPT_MAXREDIRS => 10,
 		CURLOPT_TIMEOUT => 3000,
 		CURLOPT_POSTFIELDS => $request->all(),
-		CURLOPT_HTTPHEADER => $request->header(),
+		CURLOPT_HTTPHEADER => [
+			"Authorization: $token",
+		],
 	));
 	$response = curl_exec($curl);
 	curl_close($curl);
